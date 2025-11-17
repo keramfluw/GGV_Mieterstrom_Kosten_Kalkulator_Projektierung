@@ -1,0 +1,2 @@
+# GGV_Mieterstrom_Kosten_Kalkulator_Projektierung
+berechnet dynamisch die Zählerplatzertütchtigung
