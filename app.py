@@ -16,8 +16,8 @@ st.markdown(
 st.title("Mieterstrom / GGV – Zähler- und Messkonzept (Baden-Württemberg)")
 st.write(
     "Dieses Tool liefert auf Basis vordefinierter Szenarien (10 / 20 / 40 / 80 WE) "
-    "eine Empfehlung für Messkonzept, Zählerschrank-Auslegung und grobe Kostenschätzung "
-    "für Objekte in Baden-Württemberg."
+    "eine Empfehlung für Messkonzept, Zählerschrank-Auslegung und eine differenzierte Kostenschätzung "
+    "(NB, MSB, Backend, Projekt) für Objekte in Baden-Württemberg."
 )
 
 SCENARIOS = [
@@ -38,8 +38,10 @@ SCENARIOS = [
         "kosten_material": 3000,
         "kosten_montage": 7000,
         "kosten_planung": 3000,
-        "kosten_nb_msb": 1500,
-        "kosten_sonstige": 2500,
+        "kosten_nb_netz": 500,
+        "kosten_msb": 700,
+        "kosten_backend": 300,
+        "kosten_sonstige": 1000,
     },
     {
         "we_bucket": 10,
@@ -58,8 +60,10 @@ SCENARIOS = [
         "kosten_material": 3500,
         "kosten_montage": 8000,
         "kosten_planung": 4000,
-        "kosten_nb_msb": 2000,
-        "kosten_sonstige": 4000,
+        "kosten_nb_netz": 600,
+        "kosten_msb": 1200,
+        "kosten_backend": 1200,
+        "kosten_sonstige": 1000,
     },
     {
         "we_bucket": 20,
@@ -78,8 +82,10 @@ SCENARIOS = [
         "kosten_material": 5000,
         "kosten_montage": 12000,
         "kosten_planung": 4000,
-        "kosten_nb_msb": 2500,
-        "kosten_sonstige": 5000,
+        "kosten_nb_netz": 800,
+        "kosten_msb": 1400,
+        "kosten_backend": 800,
+        "kosten_sonstige": 1000,
     },
     {
         "we_bucket": 20,
@@ -98,8 +104,10 @@ SCENARIOS = [
         "kosten_material": 6000,
         "kosten_montage": 13000,
         "kosten_planung": 6000,
-        "kosten_nb_msb": 3000,
-        "kosten_sonstige": 7000,
+        "kosten_nb_netz": 900,
+        "kosten_msb": 2000,
+        "kosten_backend": 2500,
+        "kosten_sonstige": 1100,
     },
     {
         "we_bucket": 40,
@@ -118,8 +126,10 @@ SCENARIOS = [
         "kosten_material": 8000,
         "kosten_montage": 20000,
         "kosten_planung": 7000,
-        "kosten_nb_msb": 4000,
-        "kosten_sonstige": 8000,
+        "kosten_nb_netz": 1200,
+        "kosten_msb": 2600,
+        "kosten_backend": 1500,
+        "kosten_sonstige": 1700,
     },
     {
         "we_bucket": 40,
@@ -138,8 +148,10 @@ SCENARIOS = [
         "kosten_material": 9500,
         "kosten_montage": 22000,
         "kosten_planung": 9000,
-        "kosten_nb_msb": 5000,
-        "kosten_sonstige": 12000,
+        "kosten_nb_netz": 1500,
+        "kosten_msb": 3500,
+        "kosten_backend": 4500,
+        "kosten_sonstige": 2500,
     },
     {
         "we_bucket": 80,
@@ -158,8 +170,10 @@ SCENARIOS = [
         "kosten_material": 14000,
         "kosten_montage": 35000,
         "kosten_planung": 12000,
-        "kosten_nb_msb": 7000,
-        "kosten_sonstige": 15000,
+        "kosten_nb_netz": 2000,
+        "kosten_msb": 5000,
+        "kosten_backend": 6000,
+        "kosten_sonstige": 3000,
     },
     {
         "we_bucket": 80,
@@ -178,8 +192,10 @@ SCENARIOS = [
         "kosten_material": 16000,
         "kosten_montage": 38000,
         "kosten_planung": 15000,
-        "kosten_nb_msb": 9000,
-        "kosten_sonstige": 20000,
+        "kosten_nb_netz": 2500,
+        "kosten_msb": 7000,
+        "kosten_backend": 9000,
+        "kosten_sonstige": 3500,
     },
 ]
 
@@ -199,7 +215,15 @@ def get_scenario(we: int, modell: str):
         if s["we_bucket"] == bucket and s["modell"] == modell:
             factor = max(1.0, we / bucket)
             s_scaled = s.copy()
-            for k in ["kosten_material", "kosten_montage", "kosten_planung", "kosten_nb_msb", "kosten_sonstige"]:
+            for k in [
+                "kosten_material",
+                "kosten_montage",
+                "kosten_planung",
+                "kosten_nb_netz",
+                "kosten_msb",
+                "kosten_backend",
+                "kosten_sonstige",
+            ]:
                 s_scaled[k] = round(s[k] * factor, 0)
             s_scaled["we_effektiv"] = we
             s_scaled["we_bucket"] = bucket
@@ -254,7 +278,9 @@ else:
             scenario["kosten_material"]
             + scenario["kosten_montage"]
             + scenario["kosten_planung"]
-            + scenario["kosten_nb_msb"]
+            + scenario["kosten_nb_netz"]
+            + scenario["kosten_msb"]
+            + scenario["kosten_backend"]
             + scenario["kosten_sonstige"]
         )
 
@@ -266,8 +292,10 @@ else:
                     ["Material Zählerschrank", scenario["kosten_material"]],
                     ["Montage / Elektroarbeiten", scenario["kosten_montage"]],
                     ["Planung / Engineering", scenario["kosten_planung"]],
-                    ["Netzbetreiber / MSB initial", scenario["kosten_nb_msb"]],
-                    ["Sonstige Kosten (Bau/IT/Backend)", scenario["kosten_sonstige"]],
+                    ["NB Netzdienstleistungen initial", scenario["kosten_nb_netz"]],
+                    ["MSB Zähler- / iMSys-Einrichtung initial", scenario["kosten_msb"]],
+                    ["Backend / IT initial", scenario["kosten_backend"]],
+                    ["Sonstige Projektkosten", scenario["kosten_sonstige"]],
                 ],
                 columns=["Kostenart", "Betrag (€)"],
             )
@@ -279,12 +307,13 @@ else:
     st.download_button(
         label="Aktuelles Szenario als CSV herunterladen",
         data=csv,
-        file_name="mieterstrom_ggv_bw_szenario.csv",
+        file_name="mieterstrom_ggv_bw_szenario_v2.csv",
         mime="text/csv",
     )
 
     st.info(
         "Hinweis: Alle Werte sind Richtwerte auf Basis typischer Annahmen "
         "für Baden-Württemberg (Netze BW / Stuttgart / Stadtwerke). "
-        "Für konkrete Projekte sind TAB, Messkonzept-Formblätter und Angebote verbindlich zu prüfen."
+        "Für konkrete Projekte sind TAB, Messkonzept-Formblätter und Angebote verbindlich zu prüfen. "
+        "Die Kostenteilung in NB, MSB, Backend verdeutlicht nur die Kostenstruktur, ersetzt aber keine Preisblätter."
     )
