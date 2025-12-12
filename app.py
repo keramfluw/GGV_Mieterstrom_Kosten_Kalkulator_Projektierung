@@ -2,7 +2,7 @@
 import streamlit as st
 import pandas as pd
 
-st.set_page_config(page_title="Mieterstrom & GGV – BW Zählerkonzept", layout="wide")
+st.set_page_config(page_title="baetz energy Mieterstrom & GGV – BW Zählerkonzept", layout="wide")
 
 st.markdown(
     """
